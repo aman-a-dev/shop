@@ -1,10 +1,17 @@
 "use client";
+
 import { useState, useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
-import { getAllProductsAdmin, ProductWithImages } from "@/actions/products";
+import { useSearchParams } from "next/navigation";
+import {
+  getAllProductsAdmin,
+  searchProducts,
+  type ProductWithImages,
+} from "@/actions/products";
 import { createProduct, updateProduct, deleteProduct } from "@/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -13,19 +20,37 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toast";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Copy, Check } from "lucide-react";
+
+import { SearchBar } from "@/components/blocks/search";
+import { ConfirmDialog } from "@/components/blocks/confirm-dialog";
+import { ImageUpload } from "@/components/blocks/image-upload";
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
+
   const [products, setProducts] = useState<ProductWithImages[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingProduct, setEditingProduct] =
     useState<ProductWithImages | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (query?: string) => {
     setLoading(true);
-    const result = await getAllProductsAdmin();
+    const result = query
+      ? await searchProducts(query)
+      : await getAllProductsAdmin();
     if (result.success) {
       setProducts(result.data as ProductWithImages[]);
     } else {
@@ -35,11 +60,10 @@ export default function ProductsPage() {
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    fetchProducts(searchQuery);
+  }, [searchQuery]);
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
     const result = await deleteProduct(id);
     if (result.success) {
       toast.add({
@@ -47,59 +71,77 @@ export default function ProductsPage() {
         title: "Success",
         description: "Product deleted successfully",
       });
-      fetchProducts();
+      fetchProducts(searchQuery);
     } else {
       toast.add({ type: "error", title: "Error", description: result.error });
     }
+    setDeletingId(null);
+  };
+
+  const handleToggleStatus = async (product: ProductWithImages) => {
+    const newStatus = product.status === "ACTIVE" ? "OUT_OF_STOCK" : "ACTIVE";
+    const result = await updateProduct(product.id, { status: newStatus });
+    if (result.success) {
+      toast.add({
+        type: "success",
+        title: "Success",
+        description: `Product status updated to ${newStatus}`,
+      });
+      fetchProducts(searchQuery);
+    } else {
+      toast.add({ type: "error", title: "Error", description: result.error });
+    }
+  };
+
+  const copyToClipboard = (text: string, id: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-        <Button
-          onClick={() => {
-            setEditingProduct(null);
-            setIsDialogOpen(true);
-          }}
-        >
-          <Plus className="mr-2 size-4" /> Add Product
-        </Button>
+        <div className="flex items-center gap-4">
+          <SearchBar placeholder="Search by name, description, or ID..." />
+          <Button
+            onClick={() => {
+              setEditingProduct(null);
+              setIsDialogOpen(true);
+            }}
+          >
+            <Plus className="mr-2 size-4" /> Add Product
+          </Button>
+        </div>
       </div>
-
-      {isDialogOpen && (
-        <ProductForm
-          product={editingProduct}
-          onClose={() => setIsDialogOpen(false)}
-          onSuccess={() => {
-            setIsDialogOpen(false);
-            fetchProducts();
-          }}
-        />
-      )}
 
       <div className="rounded-xl border bg-card text-card-foreground shadow">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>ID</TableHead>
               <TableHead>Name</TableHead>
+              <TableHead>Description</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Stock</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Images</TableHead>
+              <TableHead>Created At</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
+                <TableCell colSpan={9} className="text-center py-8">
                   <Loader2 className="mx-auto size-6 animate-spin" />
                 </TableCell>
               </TableRow>
             ) : products.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={9}
                   className="text-center py-8 text-muted-foreground"
                 >
                   No products found.
@@ -108,15 +150,73 @@ export default function ProductsPage() {
             ) : (
               products.map((product) => (
                 <TableRow key={product.id}>
+                  <TableCell className="font-mono text-xs">
+                    <div className="flex items-center gap-2">
+                      {product.id}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-6"
+                        onClick={() =>
+                          copyToClipboard(String(product.id), product.id)
+                        }
+                      >
+                        {copiedId === product.id ? (
+                          <Check className="size-3 text-green-500" />
+                        ) : (
+                          <Copy className="size-3" />
+                        )}
+                      </Button>
+                    </div>
+                  </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>${Number(product.price).toFixed(2)}</TableCell>
+                  <TableCell className="max-w-xs truncate">
+                    {product.description}
+                  </TableCell>
+                  <TableCell>ETB {Number(product.price).toFixed(2)}</TableCell>
                   <TableCell>{product.stock}</TableCell>
                   <TableCell>
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${product.status === "ACTIVE" ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"}`}
-                    >
-                      {product.status}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={product.status === "ACTIVE"}
+                        onCheckedChange={() => handleToggleStatus(product)}
+                      />
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                          product.status === "ACTIVE"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                        }`}
+                      >
+                        {product.status}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {product.images && product.images.length > 0 ? (
+                      <div className="flex -space-x-2">
+                        {product.images.slice(0, 3).map((img, i) => (
+                          <img
+                            key={i}
+                            src={img.url}
+                            alt=""
+                            className="size-8 rounded-full border-2 border-background object-cover"
+                          />
+                        ))}
+                        {product.images.length > 3 && (
+                          <span className="flex size-8 items-center justify-center rounded-full border-2 border-background bg-muted text-xs">
+                            +{product.images.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">
+                        None
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(product.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
@@ -133,7 +233,7 @@ export default function ProductsPage() {
                       <Button
                         variant="destructive"
                         size="icon"
-                        onClick={() => handleDelete(product.id)}
+                        onClick={() => setDeletingId(product.id)}
                       >
                         <Trash2 className="size-4" />
                       </Button>
@@ -145,19 +245,44 @@ export default function ProductsPage() {
           </TableBody>
         </Table>
       </div>
+
+      <ProductForm
+        product={editingProduct}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSuccess={() => {
+          setIsDialogOpen(false);
+          fetchProducts(searchQuery);
+        }}
+      />
+
+      <ConfirmDialog
+        open={deletingId !== null}
+        onOpenChange={(open) => !open && setDeletingId(null)}
+        onConfirm={() => deletingId && handleDelete(deletingId)}
+        title="Delete Product"
+        description="Are you sure you want to delete this product? This action cannot be undone."
+        confirmText="Delete"
+      />
     </div>
   );
 }
 
 function ProductForm({
   product,
-  onClose,
+  open,
+  onOpenChange,
   onSuccess,
 }: {
   product: ProductWithImages | null;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }) {
+  const [imageUrls, setImageUrls] = useState<string[]>(
+    product?.images?.map((img) => img.url) || [],
+  );
+
   const [, formAction] = useActionState(
     async (_prevState: any, formData: FormData) => {
       const data = {
@@ -166,17 +291,11 @@ function ProductForm({
         price: parseFloat(formData.get("price") as string),
         stock: parseInt(formData.get("stock") as string, 10),
         status: formData.get("status") as "ACTIVE" | "OUT_OF_STOCK",
-        images: formData.get("images")
-          ? (formData.get("images") as string)
-              .split("\n")
-              .map((url) => ({ url: url.trim(), isCover: false }))
-              .filter((u) => u.url)
-          : [],
+        images: imageUrls.map((url) => ({ url, isCover: false })),
       };
 
       let result;
       if (product) {
-        // Images are omitted during update as per admin.ts comments
         const { images, ...updateData } = data;
         result = await updateProduct(product.id, updateData);
       } else {
@@ -202,11 +321,13 @@ function ProductForm({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg rounded-xl border bg-background p-6 shadow-lg max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4">
-          {product ? "Edit Product" : "Create Product"}
-        </h2>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {product ? "Edit Product" : "Create Product"}
+          </DialogTitle>
+        </DialogHeader>
         <form action={formAction} className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Name</label>
@@ -216,7 +337,7 @@ function ProductForm({
             <label className="text-sm font-medium">Description</label>
             <textarea
               name="description"
-              defaultValue={product?.description}
+              defaultValue={product?.description || ""}
               required
               className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             />
@@ -228,7 +349,7 @@ function ProductForm({
                 name="price"
                 type="number"
                 step="0.01"
-                defaultValue={Number(product?.price)}
+                defaultValue={product ? Number(product.price) : ""}
                 required
               />
             </div>
@@ -237,7 +358,7 @@ function ProductForm({
               <Input
                 name="stock"
                 type="number"
-                defaultValue={product?.stock}
+                defaultValue={product?.stock || ""}
                 required
               />
             </div>
@@ -253,27 +374,27 @@ function ProductForm({
               <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
             </select>
           </div>
-          {!product && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Image URLs (one per line)
-              </label>
-              <textarea
-                name="images"
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"
-              />
-            </div>
-          )}
-          <div className="flex justify-end gap-2 mt-6">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Images</label>
+            <ImageUpload
+              value={imageUrls}
+              onChange={setImageUrls}
+              maxImages={5}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
             <SubmitButton />
-          </div>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

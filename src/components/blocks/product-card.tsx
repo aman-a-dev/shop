@@ -65,10 +65,14 @@ export function ProductCard({ product, className }: ProductCardProps) {
               )}
             />
           ) : (
-            <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-muted-foreground/50">
-              <ImageOff className="h-6 w-6" />
-              <span className="text-[10px]">No image</span>
-            </div>
+            <img
+              src="https://placehold.co/400x400?text=No+Image"
+              alt="No Image"
+              loading="lazy"
+              className={cn(
+                "h-full w-full object-contain transition-transform duration-300 ease-out group-hover:scale-[1.06]",
+              )}
+            />
           )}
 
           {/* Scrim so floating controls stay legible over bright photos */}

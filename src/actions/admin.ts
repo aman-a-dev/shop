@@ -68,7 +68,6 @@ export async function updateProduct(
     return { success: false, error: formatZodError(parsed.error) };
   }
 
-  // images are handled via dedicated add/remove image actions, not a bulk update here
   const { images, ...rest } = parsed.data;
 
   try {
@@ -160,9 +159,24 @@ export async function deleteUser(
 }
 
 // ---------- USER: Get ----------
-export async function getUsers(): Promise<ActionResult<User[]>> {
+
+export async function getUsers(query?: string): Promise<ActionResult<User[]>> {
   try {
+    let whereClause: Prisma.UserWhereInput = {};
+    if (query) {
+      const isNumeric = !isNaN(Number(query));
+      whereClause = {
+        OR: [
+          { name: { contains: query, mode: "insensitive" } },
+          { username: { contains: query, mode: "insensitive" } },
+          { telegramId: { contains: query, mode: "insensitive" } },
+          ...(isNumeric ? [{ id: Number(query) }] : []),
+        ],
+      };
+    }
+
     const users = await prisma.user.findMany({
+      where: whereClause,
       orderBy: { createdAt: "desc" },
     });
     return { success: true, data: users };

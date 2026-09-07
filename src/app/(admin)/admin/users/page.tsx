@@ -1,6 +1,8 @@
 "use client";
+
 import { useState, useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
+import { useSearchParams } from "next/navigation";
 import { getUsers, createUser, updateUser, deleteUser } from "@/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,19 +14,36 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toast";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Copy, Check } from "lucide-react";
+import { SearchBar } from "@/components/blocks/search";
+import { ConfirmDialog } from "@/components/blocks/confirm-dialog";
 import type { UserModel as User } from "@/generated/prisma/models/User";
 
 export default function UsersPage() {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
+
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [copiedField, setCopiedField] = useState<
+    "id" | "username" | "telegramId" | null
+  >(null);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (query?: string) => {
     setLoading(true);
-    const result = await getUsers();
+    const result = await getUsers(query);
     if (result.success) {
       setUsers(result.data as User[]);
     } else {
@@ -34,11 +53,10 @@ export default function UsersPage() {
   };
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    fetchUsers(searchQuery);
+  }, [searchQuery]);
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
     const result = await deleteUser(id);
     if (result.success) {
       toast.add({
@@ -46,42 +64,53 @@ export default function UsersPage() {
         title: "Success",
         description: "User deleted successfully",
       });
-      fetchUsers();
+      fetchUsers(searchQuery);
     } else {
       toast.add({ type: "error", title: "Error", description: result.error });
     }
+    setDeletingId(null);
+  };
+
+  const copyToClipboard = (
+    text: string,
+    id: number,
+    field: "id" | "username" | "telegramId",
+  ) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setCopiedField(field);
+    setTimeout(() => {
+      setCopiedId(null);
+      setCopiedField(null);
+    }, 2000);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Users</h1>
-        <Button
-          onClick={() => {
-            setEditingUser(null);
-            setIsDialogOpen(true);
-          }}
-        >
-          <Plus className="mr-2 size-4" /> Add User
-        </Button>
+        <div className="flex items-center gap-4">
+          <SearchBar placeholder="Search by name, username, telegram ID, or ID..." />
+          <Button
+            onClick={() => {
+              setEditingUser(null);
+              setIsDialogOpen(true);
+            }}
+          >
+            <Plus className="mr-2 size-4" /> Add User
+          </Button>
+        </div>
       </div>
-
-      {isDialogOpen && (
-        <UserForm
-          user={editingUser}
-          onClose={() => setIsDialogOpen(false)}
-          onSuccess={() => {
-            setIsDialogOpen(false);
-            fetchUsers();
-          }}
-        />
-      )}
 
       <div className="rounded-xl border bg-card text-card-foreground shadow">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>ID</TableHead>
               <TableHead>Name</TableHead>
+              <TableHead>Username</TableHead>
+              <TableHead>Telegram ID</TableHead>
+              <TableHead>Avatar</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Created At</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -90,14 +119,14 @@ export default function UsersPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8">
+                <TableCell colSpan={8} className="text-center py-8">
                   <Loader2 className="mx-auto size-6 animate-spin" />
                 </TableCell>
               </TableRow>
             ) : users.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={8}
                   className="text-center py-8 text-muted-foreground"
                 >
                   No users found.
@@ -106,16 +135,106 @@ export default function UsersPage() {
             ) : (
               users.map((user) => (
                 <TableRow key={user.id}>
+                  <TableCell className="font-mono text-xs">
+                    <div className="flex items-center gap-2">
+                      {user.id}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-6"
+                        onClick={() =>
+                          copyToClipboard(String(user.id), user.id, "id")
+                        }
+                      >
+                        {copiedId === user.id && copiedField === "id" ? (
+                          <Check className="size-3 text-green-500" />
+                        ) : (
+                          <Copy className="size-3" />
+                        )}
+                      </Button>
+                    </div>
+                  </TableCell>
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>
+                    {user.username ? (
+                      <div className="flex items-center gap-2">
+                        <span>{user.username}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-6"
+                          onClick={() =>
+                            copyToClipboard(user.username!, user.id, "username")
+                          }
+                        >
+                          {copiedId === user.id &&
+                          copiedField === "username" ? (
+                            <Check className="size-3 text-green-500" />
+                          ) : (
+                            <Copy className="size-3" />
+                          )}
+                        </Button>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {user.telegramId ? (
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs">
+                          {user.telegramId}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-6"
+                          onClick={() =>
+                            copyToClipboard(
+                              user.telegramId!,
+                              user.id,
+                              "telegramId",
+                            )
+                          }
+                        >
+                          {copiedId === user.id &&
+                          copiedField === "telegramId" ? (
+                            <Check className="size-3 text-green-500" />
+                          ) : (
+                            <Copy className="size-3" />
+                          )}
+                        </Button>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-muted-foreground text-sm">
+                        None
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell>
                     <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${user.role === "ADMIN" ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200" : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"}`}
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        user.role === "ADMIN"
+                          ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+                          : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+                      }`}
                     >
                       {user.role}
                     </span>
                   </TableCell>
                   <TableCell>
-                    {new Date(user.createdAt).toLocaleDateString()}
+                    {new Date(user.createdAt).toLocaleString()}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
@@ -132,7 +251,7 @@ export default function UsersPage() {
                       <Button
                         variant="destructive"
                         size="icon"
-                        onClick={() => handleDelete(user.id)}
+                        onClick={() => setDeletingId(user.id)}
                       >
                         <Trash2 className="size-4" />
                       </Button>
@@ -144,24 +263,48 @@ export default function UsersPage() {
           </TableBody>
         </Table>
       </div>
+
+      <UserForm
+        user={editingUser}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSuccess={() => {
+          setIsDialogOpen(false);
+          fetchUsers(searchQuery);
+        }}
+      />
+
+      <ConfirmDialog
+        open={deletingId !== null}
+        onOpenChange={(open) => !open && setDeletingId(null)}
+        onConfirm={() => deletingId && handleDelete(deletingId)}
+        title="Delete User"
+        description="Are you sure you want to delete this user? This action cannot be undone."
+        confirmText="Delete"
+      />
     </div>
   );
 }
 
 function UserForm({
   user,
-  onClose,
+  open,
+  onOpenChange,
   onSuccess,
 }: {
   user: User | null;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }) {
   const [, formAction] = useActionState(
     async (_prevState: any, formData: FormData) => {
       const data = {
         name: formData.get("name") as string,
+        username: (formData.get("username") as string) || undefined,
+        telegramId: (formData.get("telegramId") as string) || undefined,
         role: formData.get("role") as "USER" | "ADMIN",
+        // avatar is not editable in this form; you can add if needed
       };
 
       const result = user
@@ -187,15 +330,31 @@ function UserForm({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-xl border bg-background p-6 shadow-lg">
-        <h2 className="text-xl font-bold mb-4">
-          {user ? "Edit User" : "Create User"}
-        </h2>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{user ? "Edit User" : "Create User"}</DialogTitle>
+        </DialogHeader>
         <form action={formAction} className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Name</label>
             <Input name="name" defaultValue={user?.name} required />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Username</label>
+            <Input
+              name="username"
+              defaultValue={user?.username || ""}
+              placeholder="Optional"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Telegram ID</label>
+            <Input
+              name="telegramId"
+              defaultValue={user?.telegramId || ""}
+              placeholder="Optional"
+            />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Role</label>
@@ -208,15 +367,19 @@ function UserForm({
               <option value="ADMIN">ADMIN</option>
             </select>
           </div>
-          <div className="flex justify-end gap-2 mt-6">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
             <SubmitButton />
-          </div>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

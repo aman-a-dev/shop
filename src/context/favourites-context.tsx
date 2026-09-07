@@ -1,67 +1,76 @@
+// context/favourites-context.tsx
 "use client";
 
 import {
   createContext,
+  useContext,
   useState,
   useEffect,
-  useContext,
   ReactNode,
+  useCallback,
 } from "react";
 
-interface FavoritesContextType {
-  favourites: string[];
-  toggleFavourite: (id: string) => void;
-  isFavourite: (id: string) => boolean;
-  clearFavourites: () => void;
-}
+const STORAGE_KEY = "favourites";
 
-const FavoritesContext = createContext<FavoritesContextType>({
-  favourites: [],
-  toggleFavourite: () => {},
-  isFavourite: () => false,
-  clearFavourites: () => {},
-});
+type FavoritesContextType = {
+  favourites: string[];
+  isFavourite: (id: string) => boolean;
+  toggleFavourite: (id: string) => void;
+};
+
+const FavoritesContext = createContext<FavoritesContextType | undefined>(
+  undefined,
+);
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [favourites, setFavourites] = useState<string[]>([]);
 
-  // Load favourites on mount
+  // 1. Load from localStorage ONLY on initial mount
   useEffect(() => {
-    const stored = localStorage.getItem("favourite");
-    if (stored) {
-      try {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
         setFavourites(JSON.parse(stored));
-      } catch (error) {
-        console.error("Error parsing favourites from localStorage:", error);
-        setFavourites([]);
       }
+    } catch (e) {
+      console.error("Failed to load favourites", e);
     }
   }, []);
 
-  // Save favourites to localStorage
-  useEffect(() => {
-    localStorage.setItem("favourite", JSON.stringify(favourites));
-  }, [favourites]);
+  // Memoized to prevent unnecessary re-renders in child components
+  const isFavourite = useCallback(
+    (id: string) => favourites.includes(id),
+    [favourites],
+  );
 
-  const toggleFavourite = (id: string) => {
-    setFavourites((prev) =>
-      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id],
-    );
-  };
+  // 2. Update state AND save to localStorage synchronously
+  const toggleFavourite = useCallback((id: string) => {
+    setFavourites((prev) => {
+      const exists = prev.includes(id);
+      const next = exists ? prev.filter((fid) => fid !== id) : [...prev, id];
 
-  const isFavourite = (id: string) => favourites.includes(id);
+      // Save immediately to localStorage.
+      // This guarantees it persists the exact moment you click,
+      // completely avoiding any useEffect race conditions on refresh.
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
 
-  const clearFavourites = () => {
-    setFavourites([]);
-  };
+      return next;
+    });
+  }, []);
 
   return (
     <FavoritesContext.Provider
-      value={{ favourites, toggleFavourite, isFavourite, clearFavourites }}
+      value={{ favourites, isFavourite, toggleFavourite }}
     >
       {children}
     </FavoritesContext.Provider>
   );
 }
 
-export const useFavorites = () => useContext(FavoritesContext);
+export function useFavorites() {
+  const context = useContext(FavoritesContext);
+  if (context === undefined) {
+    throw new Error("useFavorites must be used within a FavoritesProvider");
+  }
+  return context;
+}

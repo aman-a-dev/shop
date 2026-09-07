@@ -12,14 +12,19 @@ datasource db {
   provider = "postgresql"
 }
 
-
 model User {
   id        Int      @id @default(autoincrement())
   name      String
+  
+  telegramId String?   @unique
+  username   String?
+  
   avatar    String?
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  cart      Cart?   
 }
 
 enum Role {
@@ -36,6 +41,7 @@ model Product {
   status      ProductStatus @default(ACTIVE)
 
   images      Image[]
+  cartItems   CartItem[]
 
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -59,5 +65,38 @@ model Image {
 
   createdAt DateTime @default(now())
 
+  @@index([productId])
+}
+
+// ─── CART TABLES ───────────────────────────────────────────────
+
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique 
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  items     CartItem[]
+  
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([userId])
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cartId    Int
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  quantity  Int      @default(1)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId]) // Prevent duplicate products in cart
+  @@index([cartId])
   @@index([productId])
 }

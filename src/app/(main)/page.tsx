@@ -11,6 +11,7 @@ import {
   EmptyMedia,
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SearchBar } from "@/components/blocks/search-bar";
 
 // ─── Product Grid (async server component) ───────────────────────
 async function ProductGrid() {
@@ -85,9 +86,11 @@ export default async function HomePage() {
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-6 text-center">Our Products</h1>
-      <Suspense fallback={<ProductGridSkeleton />}>
+      <SearchBar />
+      {/* <Suspense fallback={<ProductGridSkeleton />}>
         <ProductGrid />
-      </Suspense>
+      </Suspense>*/}
+      €
     </div>
   );
 }

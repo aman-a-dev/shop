@@ -2,156 +2,178 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Heart, ShoppingCart, User } from "lucide-react";
+import { Home, Heart, ShoppingCart, User, Plus } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-interface NavItem {
-  label: string;
-  icon: React.ElementType;
-  href: string;
-  color: string;
-  activeColor: string;
-}
-
-const navItems: NavItem[] = [
-  {
-    label: "Home",
-    icon: Home,
-    href: "/",
-    color: "text-muted-foreground",
-    activeColor: "text-primary",
-  },
-  {
-    label: "Favourites",
-    icon: Heart,
-    href: "/favourites",
-    color: "text-muted-foreground",
-    activeColor: "text-rose-500",
-  },
-  {
-    label: "Cart",
-    icon: ShoppingCart,
-    href: "/cart",
-    color: "text-muted-foreground",
-    activeColor: "text-emerald-500",
-  },
-  {
-    label: "Profile",
-    icon: User,
-    href: "/profile",
-    color: "text-muted-foreground",
-    activeColor: "text-violet-500",
-  },
-];
-
-export default function BottomNav() {
+export default function BottomNavWithFab() {
   const pathname = usePathname();
   const router = useRouter();
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isFabOpen, setIsFabOpen] = useState(false);
+
+  const leftItems = [
+    { label: "Home", icon: Home, href: "/", color: "text-primary" },
+    {
+      label: "Favourites",
+      icon: Heart,
+      href: "/favourites",
+      color: "text-rose-500",
+    },
+  ];
+
+  const rightItems = [
+    {
+      label: "Cart",
+      icon: ShoppingCart,
+      href: "/cart",
+      color: "text-emerald-500",
+    },
+    {
+      label: "Profile",
+      icon: User,
+      href: "/profile",
+      color: "text-violet-500",
+    },
+  ];
 
   return (
     <motion.nav
-      initial={{ y: 100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+      initial={{ y: 100 }}
+      animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
       className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
     >
-      {/* Glassmorphism background */}
-      <div className="mx-4 mb-4">
-        <div className="relative">
-          {/* Background with blur effect */}
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-xl border border-border/50 rounded-3xl shadow-2xl shadow-black/10" />
+      <div className="relative mx-4 mb-4">
+        {/* Main nav bar */}
+        <div className="bg-background/90 backdrop-blur-xl border border-border/50 rounded-3xl shadow-2xl shadow-black/10 px-6 py-3">
+          <div className="flex items-center justify-between">
+            {/* Left items */}
+            <div className="flex gap-8">
+              {leftItems.map((item) => {
+                const isActive = pathname === item.href;
+                const Icon = item.icon;
 
-          {/* Animated background pill for active/hover state */}
-          <AnimatePresence>
-            {(hoveredIndex !== null ||
-              navItems.findIndex((item) => item.href === pathname) !== -1) && (
-              <motion.div
-                className="absolute top-2 bottom-2 rounded-2xl bg-muted/50"
-                initial={false}
-                animate={{
-                  x: `${(hoveredIndex ?? navItems.findIndex((item) => item.href === pathname)) * 100}%`,
-                  width: `${100 / navItems.length}%`,
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                style={{ left: 0 }}
-              />
-            )}
-          </AnimatePresence>
-
-          {/* Nav items */}
-          <div className="relative flex items-center justify-around px-2 py-3">
-            {navItems.map((item, index) => {
-              const isActive = pathname === item.href;
-              const Icon = item.icon;
-
-              return (
-                <motion.button
-                  key={item.href}
-                  onClick={() => router.push(item.href)}
-                  onHoverStart={() => setHoveredIndex(index)}
-                  onHoverEnd={() => setHoveredIndex(null)}
-                  className={cn(
-                    "relative flex flex-col items-center justify-center w-full py-2 px-3",
-                    "transition-colors duration-200",
-                    isActive ? item.activeColor : item.color,
-                  )}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  {/* Icon with bounce animation */}
-                  <motion.div
-                    animate={{
-                      scale: isActive ? 1.1 : 1,
-                      y: isActive ? -2 : 0,
-                    }}
-                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  >
-                    <Icon
-                      size={22}
-                      strokeWidth={isActive ? 2.5 : 2}
-                      className={cn(
-                        "transition-all duration-300",
-                        isActive && "drop-shadow-sm",
-                      )}
-                    />
-                  </motion.div>
-
-                  {/* Label with slide animation */}
-                  <AnimatePresence>
-                    {isActive && (
-                      <motion.span
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 5 }}
-                        transition={{ duration: 0.2 }}
-                        className="text-[10px] font-medium mt-1"
-                      >
-                        {item.label}
-                      </motion.span>
+                return (
+                  <motion.button
+                    key={item.href}
+                    onClick={() => router.push(item.href)}
+                    whileTap={{ scale: 0.9 }}
+                    className={cn(
+                      "relative p-2 rounded-xl transition-colors",
+                      isActive ? item.color : "text-muted-foreground",
                     )}
-                  </AnimatePresence>
-
-                  {/* Active indicator dot */}
-                  {isActive && (
+                  >
                     <motion.div
-                      layoutId="activeDot"
-                      className={cn(
-                        "absolute -bottom-1 w-1 h-1 rounded-full",
-                        item.activeColor.replace("text-", "bg-"),
-                      )}
+                      animate={{ scale: isActive ? 1.1 : 1 }}
                       transition={{
                         type: "spring",
                         stiffness: 400,
-                        damping: 25,
+                        damping: 17,
                       }}
-                    />
-                  )}
-                </motion.button>
-              );
-            })}
+                    >
+                      <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                    </motion.div>
+
+                    {isActive && (
+                      <motion.div
+                        layoutId="dot"
+                        className={cn(
+                          "absolute -bottom-1 left-1/2 w-1.5 h-1.5 rounded-full -translate-x-1/2",
+                          item.color.replace("text-", "bg-"),
+                        )}
+                      />
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {/* Spacer for FAB */}
+            <div className="w-16" />
+
+            {/* Right items */}
+            <div className="flex gap-8">
+              {rightItems.map((item) => {
+                const isActive = pathname === item.href;
+                const Icon = item.icon;
+
+                return (
+                  <motion.button
+                    key={item.href}
+                    onClick={() => router.push(item.href)}
+                    whileTap={{ scale: 0.9 }}
+                    className={cn(
+                      "relative p-2 rounded-xl transition-colors",
+                      isActive ? item.color : "text-muted-foreground",
+                    )}
+                  >
+                    <motion.div
+                      animate={{ scale: isActive ? 1.1 : 1 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 17,
+                      }}
+                    >
+                      <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                    </motion.div>
+
+                    {isActive && (
+                      <motion.div
+                        layoutId="dot"
+                        className={cn(
+                          "absolute -bottom-1 left-1/2 w-1.5 h-1.5 rounded-full -translate-x-1/2",
+                          item.color.replace("text-", "bg-"),
+                        )}
+                      />
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
           </div>
         </div>
+
+        {/* Floating Action Button */}
+        <motion.button
+          onClick={() => setIsFabOpen(!isFabOpen)}
+          whileTap={{ scale: 0.9 }}
+          className="absolute left-1/2 -translate-x-1/2 -top-6 w-14 h-14 
+                     bg-primary rounded-2xl shadow-lg shadow-primary/30 
+                     flex items-center justify-center text-primary-foreground"
+          animate={{ rotate: isFabOpen ? 45 : 0 }}
+          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+        >
+          <Plus size={28} />
+        </motion.button>
+
+        {/* FAB Menu */}
+        <AnimatePresence>
+          {isFabOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="absolute left-1/2 -translate-x-1/2 -top-45 
+                         bg-background/95 backdrop-blur-xl border border-border/50 
+                         rounded-2xl shadow-xl p-2 flex flex-col gap-1"
+            >
+              {["Support", "Contact", "Admin"].map((action, i) => (
+                <motion.button
+                  key={action}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="px-4 py-2 text-sm text-foreground hover:bg-muted 
+                             rounded-xl transition-colors text-left whitespace-nowrap"
+                >
+                  {action}
+                </motion.button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.nav>
   );
