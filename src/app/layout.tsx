@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toast";
+import { TelegramAuth } from "@/components/primitives/telegram-auth";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
