@@ -90,7 +90,6 @@ export default async function HomePage() {
       {/* <Suspense fallback={<ProductGridSkeleton />}>
         <ProductGrid />
       </Suspense>*/}
-      €
     </div>
   );
 }
