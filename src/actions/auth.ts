@@ -39,10 +39,11 @@ export async function signInWithTelegram(initDataRaw: string) {
     .sign(JWT_SECRET);
 
   const cookieStore = await cookies();
+  // auth.ts
   cookieStore.set("session", token, {
     httpOnly: true,
-    secure: true,
-    sameSite: "none",
+    secure: true, // Ensure your app is served over HTTPS
+    sameSite: "lax", // Change from "none" to "lax"
     maxAge: 60 * 60 * 24 * 30,
     path: "/",
   });
