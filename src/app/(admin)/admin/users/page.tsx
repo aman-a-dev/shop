@@ -1,5 +1,7 @@
+// app/(admin)/admin/users/page.tsx
 "use client";
 
+import { Suspense } from "react";
 import { useState, useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { useSearchParams } from "next/navigation";
@@ -27,7 +29,8 @@ import { SearchBar } from "@/components/blocks/search";
 import { ConfirmDialog } from "@/components/blocks/confirm-dialog";
 import type { UserModel as User } from "@/generated/prisma/models/User";
 
-export default function UsersPage() {
+// Inner component that uses useSearchParams
+function UsersContent() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
 
@@ -286,6 +289,7 @@ export default function UsersPage() {
   );
 }
 
+// UserForm component (unchanged)
 function UserForm({
   user,
   open,
@@ -304,7 +308,6 @@ function UserForm({
         username: (formData.get("username") as string) || undefined,
         telegramId: (formData.get("telegramId") as string) || undefined,
         role: formData.get("role") as "USER" | "ADMIN",
-        // avatar is not editable in this form; you can add if needed
       };
 
       const result = user
@@ -390,5 +393,20 @@ function SubmitButton() {
       {pending && <Loader2 className="mr-2 size-4 animate-spin" />}
       {pending ? "Saving..." : "Save"}
     </Button>
+  );
+}
+
+// Main page with Suspense boundary
+export default function UsersPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-60">
+          <Loader2 className="size-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <UsersContent />
+    </Suspense>
   );
 }
