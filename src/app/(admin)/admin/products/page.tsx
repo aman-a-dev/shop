@@ -1,5 +1,7 @@
+// app/(admin)/admin/products/page.tsx
 "use client";
 
+import { Suspense } from "react";
 import { useState, useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { useSearchParams } from "next/navigation";
@@ -34,7 +36,8 @@ import { SearchBar } from "@/components/blocks/search";
 import { ConfirmDialog } from "@/components/blocks/confirm-dialog";
 import { ImageUpload } from "@/components/blocks/image-upload";
 
-export default function ProductsPage() {
+// Inner component that uses useSearchParams
+function ProductsContent() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
 
@@ -268,6 +271,7 @@ export default function ProductsPage() {
   );
 }
 
+// ProductForm component (unchanged, but keep it inside same file)
 function ProductForm({
   product,
   open,
@@ -405,5 +409,20 @@ function SubmitButton() {
       {pending && <Loader2 className="mr-2 size-4 animate-spin" />}
       {pending ? "Saving..." : "Save"}
     </Button>
+  );
+}
+
+// Main page with Suspense boundary
+export default function ProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-60">
+          <Loader2 className="size-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <ProductsContent />
+    </Suspense>
   );
 }
