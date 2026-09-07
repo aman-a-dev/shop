@@ -1,3 +1,4 @@
+import "./globals.css";
 import BottomNav from "@/components/blocks/bottom-nav";
 import { FavoritesProvider } from "@/context/favourites-context";
 import { TelegramProvider } from "@/context/telegram-context";
