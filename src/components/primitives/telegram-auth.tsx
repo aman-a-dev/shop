@@ -1,15 +1,13 @@
-// telegram-auth.tsx
 "use client";
 import { useEffect } from "react";
-import { useLaunchParams } from "@telegram-apps/sdk-react"; // Changed import
+import { useTelegram } from "@/context/telegram-context";
 import { signInWithTelegram } from "@/actions/auth";
 
 export function TelegramAuth() {
-  const launchParams = useLaunchParams();
-  const initDataRaw = launchParams.initDataRaw;
+  const { initDataRaw } = useTelegram();
 
   useEffect(() => {
-    if (typeof initDataRaw === "string" && initDataRaw.length > 0) {
+    if (initDataRaw) {
       signInWithTelegram(initDataRaw).catch((err) => {
         console.error("Telegram Auth Failed:", err);
       });
