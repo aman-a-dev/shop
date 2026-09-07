@@ -1,7 +1,9 @@
 // app/(admin)/admin/cart/page.tsx
 "use client";
 
+import { Suspense } from "react";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { getAllCarts, searchCarts, type CartWithDetails } from "@/actions/cart";
 import { getCartTotal } from "@/actions/cart";
 import { Button } from "@/components/ui/button";
@@ -22,9 +24,9 @@ import {
 import { toast } from "@/components/ui/toast";
 import { Loader2, ShoppingCart, User, Copy, Check } from "lucide-react";
 import { SearchBar } from "@/components/blocks/search";
-import { useSearchParams } from "next/navigation";
 
-export default function CartsPage() {
+// Inner component that uses useSearchParams
+function CartsContent() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
 
@@ -222,5 +224,20 @@ export default function CartsPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+// Main page with Suspense boundary
+export default function CartsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-60">
+          <Loader2 className="size-8 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <CartsContent />
+    </Suspense>
   );
 }
