@@ -1,3 +1,5 @@
+"use server";
+
 import { validate, parse } from "@telegram-apps/init-data-node";
 import { SignJWT } from "jose";
 import { cookies } from "next/headers";
