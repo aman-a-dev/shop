@@ -12,6 +12,7 @@ import {
   ItemDescription,
   ItemActions,
 } from "@/components/ui/item";
+import Link from "next/link";
 
 type ProfileUser = {
   id: number;
@@ -90,7 +91,7 @@ export function ProfileView({ user }: { user: ProfileUser }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.18, ease: "easeOut" }}
             >
-              <Item variant="outline" render={<a href="/admin" />}>
+              <Item variant="outline" render={<Link href="/admin" />}>
                 <ItemMedia variant="icon">
                   <ShieldUser />
                 </ItemMedia>

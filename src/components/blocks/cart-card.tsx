@@ -60,6 +60,7 @@ export function CartCard({ item, onRemoved }: CartCardProps) {
         description: "An unexpected error occurred",
         type: "error",
       });
+      console.log(error);
     } finally {
       setIsUpdating(false);
     }
@@ -91,6 +92,7 @@ export function CartCard({ item, onRemoved }: CartCardProps) {
         description: "An unexpected error occurred",
         type: "error",
       });
+      console.log(error);
     }
   };
 
@@ -104,7 +106,7 @@ export function CartCard({ item, onRemoved }: CartCardProps) {
       className="flex flex-col sm:flex-row gap-4 p-4 border rounded-lg bg-card"
     >
       {/* Image at left */}
-      <div className="relative w-full sm:w-32 h-32 flex-shrink-0 overflow-hidden rounded-md bg-muted">
+      <div className="relative w-full sm:w-32 h-32 shrink-0 overflow-hidden rounded-md bg-muted">
         <Image
           src={coverImage}
           alt={product.name}

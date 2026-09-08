@@ -1,4 +1,5 @@
 "use server";
+
 import prisma from "@/lib/prisma";
 import type { ProductModel as Product } from "@/generated/prisma/models/Product";
 import type { ImageModel } from "@/generated/prisma/models/Image";

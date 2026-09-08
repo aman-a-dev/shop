@@ -52,6 +52,7 @@ export function AddToCartButton({
         description: "An unexpected error occurred",
         type: "error",
       });
+      console.log(error);
     } finally {
       setIsLoading(false);
     }

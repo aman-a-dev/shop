@@ -44,7 +44,7 @@ async function CartContent() {
           </EmptyMedia>
           <EmptyTitle>Your cart is empty</EmptyTitle>
           <EmptyDescription>
-            Looks like you haven't added anything to your cart yet.
+            Looks like you haven&apos;t added anything to your cart yet.
           </EmptyDescription>
         </EmptyHeader>
         <div className="flex justify-center mt-4">

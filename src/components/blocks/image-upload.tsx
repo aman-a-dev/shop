@@ -1,12 +1,10 @@
-// components/admin/ImageUpload.tsx
 "use client";
 
 import { useState, useRef } from "react";
 import { uploadImage, deleteImage } from "@/lib/blob";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
-import { ImagePlus, X, Loader2, Upload } from "lucide-react";
+import { ImagePlus, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ImageUploadProps {

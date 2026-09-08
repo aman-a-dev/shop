@@ -96,10 +96,7 @@ export default function AdminLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton
                   render={
-                    <Link
-                      href="/admin/cart"
-                      className="flex items-center gap-2 w-full"
-                    />
+                    <Link href="/" className="flex items-center gap-2 w-full" />
                   }
                   tooltip="Carts"
                 >

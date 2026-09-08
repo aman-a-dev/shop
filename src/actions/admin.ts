@@ -182,5 +182,6 @@ export async function getUsers(query?: string): Promise<ActionResult<User[]>> {
     return { success: true, data: users };
   } catch (error) {
     return { success: false, error: "Failed to fetch users" };
+    console.log(error);
   }
 }

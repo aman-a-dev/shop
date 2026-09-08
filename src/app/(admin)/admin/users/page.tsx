@@ -90,7 +90,7 @@ function UsersContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center flex-col justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Users</h1>
         <div className="flex items-center gap-4">
           <SearchBar placeholder="Search by name, username, telegram ID, or ID..." />

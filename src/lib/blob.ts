@@ -1,8 +1,6 @@
-// actions/admin/blob.ts
 "use server";
 
 import { put, del } from "@vercel/blob";
-import { revalidatePath } from "next/cache";
 
 export async function uploadImage(formData: FormData): Promise<{
   success: boolean;

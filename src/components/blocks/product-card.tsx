@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { AddToCartButton } from "@/components/primitives/add-to-cart-btn";
 import { useFavorites } from "@/context/favourites-context";
-import { Heart, ImageOff } from "lucide-react";
+import { Heart } from "lucide-react";
 import type { ProductModel } from "@/generated/prisma/models/Product";
 import type { ImageModel } from "@/generated/prisma/models/Image";
 import { formattedPrice } from "@/lib/utils";
@@ -131,7 +131,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
         {/* Content: price */}
         <CardContent className="px-3 pt-1">
           <span className="text-sm font-semibold text-foreground">
-            {formattedPrice(Number(product.price))}
+            {formattedPrice(Number(price))}
           </span>
         </CardContent>
 

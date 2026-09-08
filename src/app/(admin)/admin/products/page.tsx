@@ -104,7 +104,7 @@ function ProductsContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center flex-col justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Products</h1>
         <div className="flex items-center gap-4">
           <SearchBar placeholder="Search by name, description, or ID..." />

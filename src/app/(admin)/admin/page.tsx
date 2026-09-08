@@ -50,7 +50,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-center">
+        Dashboard Overview
+      </h1>
       {loading ? (
         <div className="flex items-center justify-center py-12">
           <div className="size-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />

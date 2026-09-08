@@ -96,7 +96,7 @@ model CartItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([cartId, productId]) // Prevent duplicate products in cart
+  @@unique([cartId, productId]) 
   @@index([cartId])
   @@index([productId])
 }
