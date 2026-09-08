@@ -30,14 +30,29 @@ export default function ProfilePage() {
       .catch(() => setError("Could not load your profile."));
   }, [ready, initDataRaw]);
 
+  // if (error) {
+  //   return (
+  //     <div className="flex min-h-screen items-center justify-center px-4 text-center text-sm text-muted-foreground">
+  //       {error}
+  //     </div>
+  //   );
+  // }
   if (error) {
+    const webAppExists =
+      typeof window !== "undefined" && !!(window as any).Telegram?.WebApp;
+    const rawInitData = (window as any).Telegram?.WebApp?.initData;
+
     return (
-      <div className="flex min-h-screen items-center justify-center px-4 text-center text-sm text-muted-foreground">
-        {error}
+      <div className="flex min-h-screen flex-col items-center justify-center gap-2 px-4 text-center text-xs text-muted-foreground">
+        <p>{error}</p>
+        <p>WebApp exists: {String(webAppExists)}</p>
+        <p>
+          initData: {rawInitData ? `"${rawInitData.slice(0, 50)}..."` : "empty"}
+        </p>
+        <p>ready: {String(ready)}</p>
       </div>
     );
   }
-
   if (!user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
