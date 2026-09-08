@@ -8,7 +8,7 @@ import { formattedPrice } from "@/lib/utils";
 import { updateCartItemQuantity, removeFromCart } from "@/actions/cart";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { toast } from "@/components/ui/toast"; // Adjust path if your toast file is elsewhere
+import { toast } from "@/components/ui/toast";
 
 interface CartCardProps {
   item: {
@@ -17,7 +17,7 @@ interface CartCardProps {
     product: {
       id: number;
       name: string;
-      price: number; // Now strictly a number
+      price: number;
       images: { url: string; isCover: boolean }[];
     };
   };
@@ -29,24 +29,29 @@ export function CartCard({ item, onRemoved }: CartCardProps) {
   const [quantity, setQuantity] = useState(initialQuantity);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
+  // Determine cover image URL, with fallback placeholder
   const coverImage =
     product.images.find((img) => img.isCover)?.url ||
     product.images[0]?.url ||
     "https://placehold.co/400x400?text=No+Image";
+
+  // Fallback image to use if the main image fails to load
+  const fallbackImage = "https://placehold.co/400x400?text=No+Image";
 
   const handleUpdateQuantity = async (newQuantity: number) => {
     if (newQuantity < 1) return;
     setIsUpdating(true);
     const previousQuantity = quantity;
 
-    // 1. Optimistic Update: Update UI immediately
+    // Optimistic update
     setQuantity(newQuantity);
 
     try {
       const result = await updateCartItemQuantity(cartItemId, newQuantity);
       if (!result.success) {
-        setQuantity(previousQuantity); // Revert on failure
+        setQuantity(previousQuantity);
         toast.add({
           title: "Update Failed",
           description: result.error || "Could not update quantity",
@@ -60,7 +65,7 @@ export function CartCard({ item, onRemoved }: CartCardProps) {
         description: "An unexpected error occurred",
         type: "error",
       });
-      console.log(error);
+      console.error(error);
     } finally {
       setIsUpdating(false);
     }
@@ -71,7 +76,7 @@ export function CartCard({ item, onRemoved }: CartCardProps) {
     try {
       const result = await removeFromCart(cartItemId);
       if (result.success) {
-        onRemoved(); // Tell parent to instantly remove from list
+        onRemoved();
         toast.add({
           title: "Removed",
           description: "Item removed from your cart",
@@ -92,7 +97,7 @@ export function CartCard({ item, onRemoved }: CartCardProps) {
         description: "An unexpected error occurred",
         type: "error",
       });
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -105,17 +110,18 @@ export function CartCard({ item, onRemoved }: CartCardProps) {
       transition={{ duration: 0.3 }}
       className="flex flex-col sm:flex-row gap-4 p-4 border rounded-lg bg-card"
     >
-      {/* Image at left */}
+      {/* Product Image */}
       <div className="relative w-full sm:w-32 h-32 shrink-0 overflow-hidden rounded-md bg-muted">
         <Image
-          src={coverImage}
+          src={imgError ? fallbackImage : coverImage}
           alt={product.name}
           fill
           className="object-cover"
+          onError={() => setImgError(true)}
         />
       </div>
 
-      {/* Details at right */}
+      {/* Product Details */}
       <div className="flex flex-col flex-1 justify-between">
         <div>
           <Link
@@ -155,7 +161,7 @@ export function CartCard({ item, onRemoved }: CartCardProps) {
             </Button>
           </div>
 
-          {/* Total for this item & Remove */}
+          {/* Subtotal & Remove Button */}
           <div className="flex items-center gap-4">
             <span className="font-semibold">
               {formattedPrice(product.price * quantity)}
