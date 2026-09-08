@@ -79,8 +79,12 @@ async function CartContent() {
           <p className="text-sm text-muted-foreground">Total</p>
           <p className="text-2xl font-bold">{formattedPrice(total)}</p>
         </div>
-        <Button size="lg" className="w-full sm:w-auto">
-          Proceed to Checkout
+        <Button
+          render={<a href="tele:0902991919" />}
+          size="lg"
+          className="w-full sm:w-auto"
+        >
+          Buy Now
         </Button>
       </div>
     </div>
@@ -114,7 +118,7 @@ function CartSkeleton() {
 export default async function CartPage() {
   return (
     <div className="container mx-auto py-8 max-w-4xl">
-      <h1 className="text-2xl font-bold mb-6">Shopping Cart</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">Shopping Cart</h1>
       <Suspense fallback={<CartSkeleton />}>
         <CartContent />
       </Suspense>

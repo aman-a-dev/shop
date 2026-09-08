@@ -5,12 +5,19 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import type { ActionResult } from "./products";
-
+import { getSession } from "@/lib/session";
+import { redirect } from "next/navigation";
 // ---------- PUBLIC CART ACTIONS (for logged-in users) ----------
 
 async function getCurrentUserId() {
   // Replace with your actual auth logic
-  return 1; // Mock
+  const session = await getSession();
+
+  // 2. If no session or role is not ADMIN, redirect to home
+  if (!session || session.role !== "ADMIN") {
+    redirect("/");
+  }
+  return session.userId;
 }
 
 export async function addToCart(productId: number, quantity: number = 1) {
