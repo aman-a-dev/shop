@@ -50,5 +50,14 @@ export async function signInWithTelegram(initDataRaw: string) {
     path: "/",
   });
 
-  return { success: true, userId: user.id };
+  return {
+    success: true,
+    user: {
+      id: user.id,
+      name: user.name,
+      username: user.username,
+      avatar: user.avatar,
+      role: user.role,
+    },
+  };
 }
