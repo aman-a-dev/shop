@@ -46,8 +46,15 @@ export function ProfileView({ user }: { user: ProfileUser }) {
             transition={{ duration: 0.35, delay: 0.05 }}
             className="flex flex-col items-center gap-4 text-center"
           >
-            <div className="rounded-full p-1.5 ring-2 ring-border/70 shadow-md">
-              <Avatar size="lg" className="size-56">
+            <div
+              className="rounded-full p-1.5 ring-2 ring-border/70 shadow-md"
+              style={{ width: 140, height: 140 }}
+            >
+              <Avatar
+                size="lg"
+                className="h-full w-full rounded-full"
+                style={{ width: "100%", height: "100%" }}
+              >
                 {user.avatar && (
                   <AvatarImage
                     src={user.avatar}
@@ -55,7 +62,7 @@ export function ProfileView({ user }: { user: ProfileUser }) {
                     className="object-cover"
                   />
                 )}
-                <AvatarFallback className="text-3xl font-medium">
+                <AvatarFallback className="text-4xl font-medium">
                   {initials}
                 </AvatarFallback>
               </Avatar>
