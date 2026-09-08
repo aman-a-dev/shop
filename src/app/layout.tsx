@@ -1,12 +1,25 @@
+import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
-export default function MainLayout({ children }: LayoutProps<"/">) {
+export const metadata: Metadata = {
+  title: "Shop",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="mb-24 mx-2">
+    <html lang="en">
       <head>
-        <script src="https://telegram.org/js/telegram-web-app.js" />
+        <Script
+          src="https://telegram.org/js/telegram-web-app.js"
+          strategy="beforeInteractive"
+        />
       </head>
-      {children}
-    </div>
+      <body>{children}</body>
+    </html>
   );
 }
