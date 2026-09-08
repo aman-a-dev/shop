@@ -1,6 +1,6 @@
 "use server";
 
-import { validate, parse } from "@telegram-apps/init-data-node";
+import { validate } from "@telegram-apps/init-data-node";
 import { SignJWT } from "jose";
 import { cookies } from "next/headers";
 import prisma from "@/lib/prisma";
@@ -8,24 +8,43 @@ import prisma from "@/lib/prisma";
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
 const JWT_SECRET = new TextEncoder().encode(process.env.SESSION_SECRET!);
 
+interface TelegramRawUser {
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  photo_url?: string;
+}
+
 export async function signInWithTelegram(initDataRaw: string) {
+  // Still use the library for signature verification — that part works fine.
   try {
     validate(initDataRaw, BOT_TOKEN, { expiresIn: 3600 });
   } catch {
     throw new Error("Invalid Telegram init data");
   }
 
-  const { user: tgUser } = parse(initDataRaw);
-  if (!tgUser) throw new Error("No user in init data");
+  // Parse the user ourselves straight from the raw query string, instead
+  // of trusting parse()'s camelCase mapping.
+  const params = new URLSearchParams(initDataRaw);
+  const userRaw = params.get("user");
+  if (!userRaw) throw new Error("No user in init data");
+
+  let tgUser: TelegramRawUser;
+  try {
+    tgUser = JSON.parse(userRaw);
+  } catch {
+    throw new Error("Malformed user data");
+  }
 
   const firstName =
-    typeof tgUser.firstName === "string" && tgUser.firstName.length > 0
-      ? tgUser.firstName
+    typeof tgUser.first_name === "string" && tgUser.first_name.length > 0
+      ? tgUser.first_name
       : "Telegram User";
   const username =
     typeof tgUser.username === "string" ? tgUser.username : undefined;
   const photoUrl =
-    typeof tgUser.photoUrl === "string" ? tgUser.photoUrl : undefined;
+    typeof tgUser.photo_url === "string" ? tgUser.photo_url : undefined;
   const telegramId = String(tgUser.id);
 
   const user = await prisma.user.upsert({
@@ -41,7 +60,6 @@ export async function signInWithTelegram(initDataRaw: string) {
     .sign(JWT_SECRET);
 
   const cookieStore = await cookies();
-
   cookieStore.set("session", token, {
     httpOnly: true,
     secure: true,
