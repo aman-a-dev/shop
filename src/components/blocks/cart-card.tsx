@@ -31,13 +31,11 @@ export function CartCard({ item, onRemoved }: CartCardProps) {
   const [isRemoving, setIsRemoving] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  // Determine cover image URL, with fallback placeholder
   const coverImage =
     product.images.find((img) => img.isCover)?.url ||
     product.images[0]?.url ||
     "https://placehold.co/400x400?text=No+Image";
 
-  // Fallback image to use if the main image fails to load
   const fallbackImage = "https://placehold.co/400x400?text=No+Image";
 
   const handleUpdateQuantity = async (newQuantity: number) => {
