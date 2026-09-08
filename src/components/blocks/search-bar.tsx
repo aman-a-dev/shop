@@ -87,9 +87,12 @@ export function SearchBar() {
           <Skeleton className="h-10 flex-1" />
           <Skeleton className="h-10 w-10" />
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+        <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-square rounded-lg" />
+            <Skeleton
+              key={i}
+              className="mb-2 break-inside-avoid rounded-lg aspect-[3/4]"
+            />
           ))}
         </div>
       </div>
@@ -200,12 +203,7 @@ export function SearchBar() {
           </EmptyHeader>
         </Empty>
       ) : (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2"
-        >
+        <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2">
           <AnimatePresence mode="popLayout">
             {filtered.map((product, index) => (
               <motion.div
@@ -219,12 +217,13 @@ export function SearchBar() {
                   delay: index * 0.03,
                   ease: "easeOut",
                 }}
+                className="mb-2 break-inside-avoid"
               >
                 <ProductCard product={product} />
               </motion.div>
             ))}
           </AnimatePresence>
-        </motion.div>
+        </div>
       )}
     </div>
   );
