@@ -2,20 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Home,
-  Heart,
-  ShoppingCart,
-  User,
-  Plus,
-  MessageSquare,
-  Mail,
-  Settings,
-  Shield,
-  Phone,
-  Headphones,
-  HelpCircle,
-} from "lucide-react";
+import { Home, Heart, ShoppingCart, User, Plus } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -49,29 +36,10 @@ export default function BottomNavWithFab() {
     },
   ];
 
-  // FAB menu items with real icons and links
   const fabItems = [
-    {
-      label: "Support",
-      href: "/support",
-      icon: Headphones,
-      color: "text-blue-500",
-      bgColor: "bg-blue-50 dark:bg-blue-950/20",
-    },
-    {
-      label: "Contact",
-      href: "/contact",
-      icon: Mail,
-      color: "text-emerald-500",
-      bgColor: "bg-emerald-50 dark:bg-emerald-950/20",
-    },
-    {
-      label: "Admin",
-      href: "/admin",
-      icon: Settings,
-      color: "text-purple-500",
-      bgColor: "bg-purple-50 dark:bg-purple-950/20",
-    },
+    { label: "Support", href: "/support" },
+    { label: "Contact", href: "/contact" },
+    { label: "Admin", href: "/admin" },
   ];
 
   return (
@@ -185,7 +153,7 @@ export default function BottomNavWithFab() {
           <Plus size={28} />
         </motion.button>
 
-        {/* FAB Menu with real icons and links */}
+        {/* FAB Menu */}
         <AnimatePresence>
           {isFabOpen && (
             <motion.div
@@ -193,44 +161,27 @@ export default function BottomNavWithFab() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: 20 }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className="absolute left-1/2 -translate-x-1/2 -top-[200px] 
+              className="absolute left-1/2 -translate-x-1/2 -top-48 
                          bg-background/95 backdrop-blur-xl border border-border/50 
-                         rounded-2xl shadow-xl p-2 flex flex-col gap-1 min-w-[180px]"
+                         rounded-2xl shadow-xl p-2 flex flex-col gap-1 min-w-[140px]"
             >
-              {fabItems.map((item, i) => {
-                const Icon = item.icon;
-
-                return (
-                  <motion.button
-                    key={item.href}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ delay: i * 0.05 }}
-                    onClick={() => {
-                      router.push(item.href);
-                      setIsFabOpen(false);
-                    }}
-                    className={cn(
-                      "px-4 py-2.5 text-sm text-foreground hover:bg-muted",
-                      "rounded-xl transition-colors text-left whitespace-nowrap",
-                      "flex items-center gap-3 group",
-                      item.bgColor,
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        "p-1.5 rounded-lg transition-colors",
-                        item.bgColor,
-                        "group-hover:bg-transparent",
-                      )}
-                    >
-                      <Icon size={18} className={item.color} />
-                    </div>
-                    <span className="font-medium">{item.label}</span>
-                  </motion.button>
-                );
-              })}
+              {fabItems.map((item, i) => (
+                <motion.button
+                  key={item.href}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ delay: i * 0.05 }}
+                  onClick={() => {
+                    router.push(item.href);
+                    setIsFabOpen(false);
+                  }}
+                  className="px-4 py-2.5 text-sm text-foreground hover:bg-muted 
+                             rounded-xl transition-colors text-left"
+                >
+                  {item.label}
+                </motion.button>
+              ))}
             </motion.div>
           )}
         </AnimatePresence>

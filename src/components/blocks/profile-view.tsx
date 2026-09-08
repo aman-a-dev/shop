@@ -97,70 +97,7 @@ export function ProfileView({ user }: { user: ProfileUser }) {
                 )}
                 <p className="text-xs text-muted-foreground">ID: {user.id}</p>
               </div>
-
-              <div className="flex gap-2 mt-2">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Settings className="size-4" />
-                  Edit Profile
-                </Button>
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <Bell className="size-4" />
-                </Button>
-              </div>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* Quick Stats or Info Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, delay: 0.1, ease: "easeOut" }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Account</CardTitle>
-            <CardDescription>Manage your account settings</CardDescription>
-          </CardHeader>
-          <CardContent className="px-0">
-            <ItemGroup className="gap-0">
-              <Item className="rounded-none px-6 py-3 hover:bg-muted/50 cursor-pointer">
-                <ItemMedia variant="icon">
-                  <User className="size-4 text-muted-foreground" />
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle className="text-sm font-medium">
-                    Personal Information
-                  </ItemTitle>
-                  <ItemDescription className="text-xs">
-                    Update your details
-                  </ItemDescription>
-                </ItemContent>
-                <ItemActions>
-                  <ChevronRight className="size-4 text-muted-foreground" />
-                </ItemActions>
-              </Item>
-
-              <Separator />
-
-              <Item className="rounded-none px-6 py-3 hover:bg-muted/50 cursor-pointer">
-                <ItemMedia variant="icon">
-                  <CreditCard className="size-4 text-muted-foreground" />
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle className="text-sm font-medium">
-                    Payment Methods
-                  </ItemTitle>
-                  <ItemDescription className="text-xs">
-                    Manage billing
-                  </ItemDescription>
-                </ItemContent>
-                <ItemActions>
-                  <ChevronRight className="size-4 text-muted-foreground" />
-                </ItemActions>
-              </Item>
-            </ItemGroup>
           </CardContent>
         </Card>
       </motion.div>
