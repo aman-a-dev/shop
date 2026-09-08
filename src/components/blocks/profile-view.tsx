@@ -1,9 +1,8 @@
 "use client";
 
 import { motion } from "motion/react";
-import { LifeBuoy, ShieldUser, ChevronRight, LogOut } from "lucide-react";
+import { LifeBuoy, ShieldUser, ChevronRight } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Item,
   ItemGroup,
@@ -13,9 +12,8 @@ import {
   ItemDescription,
   ItemActions,
 } from "@/components/ui/item";
+import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 
 type ProfileUser = {
   id: number;
@@ -23,23 +21,6 @@ type ProfileUser = {
   username: string | null;
   avatar: string | null;
   role: "USER" | "ADMIN";
-};
-
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08 },
-  },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 12 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
-  },
 };
 
 export function ProfileView({ user }: { user: ProfileUser }) {
@@ -52,132 +33,114 @@ export function ProfileView({ user }: { user: ProfileUser }) {
 
   return (
     <motion.div
-      variants={container}
-      initial="hidden"
-      animate="show"
-      className="flex flex-1 flex-col gap-5 p-4 md:p-8 max-w-lg mx-auto w-full"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="flex flex-1 flex-col"
     >
-      {/* Profile Header Card */}
-      <motion.div variants={item}>
-        <Card className="overflow-hidden border-none shadow-md bg-gradient-to-b from-muted/50 to-background">
-          <CardContent className="pt-8 pb-6">
-            <div className="flex flex-col items-center gap-5">
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className="relative"
-              >
-                <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 blur-md" />
-                <Avatar className="relative size-24 ring-4 ring-background shadow-sm">
-                  {user.avatar && (
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                  )}
-                  <AvatarFallback className="text-2xl font-semibold bg-primary/10 text-primary">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-                {user.role === "ADMIN" && (
-                  <Badge
-                    variant="secondary"
-                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 gap-1.5 px-2.5 py-0.5 text-[11px] font-medium shadow-sm"
-                  >
-                    <ShieldUser className="size-3" />
-                    Admin
-                  </Badge>
+      <Card className="border-border/60">
+        <CardContent className="p-0">
+          {/* Profile header */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.05 }}
+            className="flex flex-col items-center gap-3 px-6 py-8"
+          >
+            <div className="rounded-full p-1 ring-1 ring-border/70 shadow-sm">
+              <Avatar size="lg" className="size-20">
+                {user.avatar && (
+                  <AvatarImage
+                    src={user.avatar}
+                    alt={user.name}
+                    className="object-cover"
+                  />
                 )}
-              </motion.div>
-
-              <div className="flex flex-col items-center gap-1.5 text-center">
-                <h2 className="text-xl font-semibold tracking-tight">
-                  {user.name}
-                </h2>
-                {user.username && (
-                  <p className="text-sm text-muted-foreground font-medium">
-                    @{user.username}
-                  </p>
-                )}
-                <p className="text-xs text-muted-foreground/70 font-mono mt-0.5">
-                  ID: {user.id}
-                </p>
-              </div>
+                <AvatarFallback className="text-lg font-medium">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
 
-      {/* Support & Admin Section */}
-      <motion.div variants={item} className="mt-auto">
-        <Card className="overflow-hidden shadow-sm">
-          <CardContent className="p-0">
-            <ItemGroup className="gap-0">
+            <div className="flex flex-col items-center gap-0.5 text-center">
+              <span className="text-base font-semibold tracking-tight">
+                {user.name}
+              </span>
+
+              {user.username && (
+                <span className="text-sm text-muted-foreground">
+                  @{user.username}
+                </span>
+              )}
+
+              <span className="text-xs text-muted-foreground/70">
+                ID {user.id}
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Support + Admin */}
+          <CardContent className="border-t border-border/50 p-4">
+            <ItemGroup className="gap-2">
               <motion.div
-                whileTap={{ scale: 0.995 }}
-                transition={{ duration: 0.15 }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.12 }}
               >
                 <Item
-                  render={
-                    <a
-                      href="https://t.me/Aman_a_dev"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    />
-                  }
-                  className="group rounded-none px-5 py-4 hover:bg-muted/40 transition-colors duration-200 cursor-pointer"
+                  variant="outline"
+                  render={<a href="https://t.me/Aman_a_dev" />}
+                  className="cursor-pointer transition-all duration-200 hover:bg-muted/50 hover:shadow-sm active:scale-[0.99]"
                 >
                   <ItemMedia variant="icon">
-                    <div className="flex size-9 items-center justify-center rounded-xl bg-primary/8 text-primary transition-transform duration-200 group-hover:scale-105">
-                      <LifeBuoy className="size-4" />
-                    </div>
+                    <LifeBuoy />
                   </ItemMedia>
-                  <ItemContent className="gap-0.5">
-                    <ItemTitle className="text-[15px] font-medium">
-                      Support
-                    </ItemTitle>
-                    <ItemDescription className="text-[13px]">
+
+                  <ItemContent>
+                    <ItemTitle className="font-medium">Support</ItemTitle>
+                    <ItemDescription className="text-xs">
                       Get help or contact us
                     </ItemDescription>
                   </ItemContent>
+
                   <ItemActions>
-                    <ChevronRight className="size-4 text-muted-foreground/50 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-muted-foreground" />
+                    <ChevronRight className="size-4 text-muted-foreground" />
                   </ItemActions>
                 </Item>
               </motion.div>
 
               {user.role === "ADMIN" && (
-                <>
-                  <Separator className="mx-5 w-auto" />
-                  <motion.div
-                    whileTap={{ scale: 0.995 }}
-                    transition={{ duration: 0.15 }}
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.18 }}
+                >
+                  <Item
+                    variant="outline"
+                    render={<Link href="/admin" />}
+                    className="cursor-pointer transition-all duration-200 hover:bg-muted/50 hover:shadow-sm active:scale-[0.99]"
                   >
-                    <Item
-                      render={<Link href="/admin" />}
-                      className="group rounded-none px-5 py-4 hover:bg-muted/40 transition-colors duration-200 cursor-pointer"
-                    >
-                      <ItemMedia variant="icon">
-                        <div className="flex size-9 items-center justify-center rounded-xl bg-primary/8 text-primary transition-transform duration-200 group-hover:scale-105">
-                          <ShieldUser className="size-4" />
-                        </div>
-                      </ItemMedia>
-                      <ItemContent className="gap-0.5">
-                        <ItemTitle className="text-[15px] font-medium">
-                          Admin Panel
-                        </ItemTitle>
-                        <ItemDescription className="text-[13px]">
-                          Manage products and orders
-                        </ItemDescription>
-                      </ItemContent>
-                      <ItemActions>
-                        <ChevronRight className="size-4 text-muted-foreground/50 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-muted-foreground" />
-                      </ItemActions>
-                    </Item>
-                  </motion.div>
-                </>
+                    <ItemMedia variant="icon">
+                      <ShieldUser />
+                    </ItemMedia>
+
+                    <ItemContent>
+                      <ItemTitle className="font-medium">Admin panel</ItemTitle>
+                      <ItemDescription className="text-xs">
+                        Manage products and orders
+                      </ItemDescription>
+                    </ItemContent>
+
+                    <ItemActions>
+                      <ChevronRight className="size-4 text-muted-foreground" />
+                    </ItemActions>
+                  </Item>
+                </motion.div>
               )}
             </ItemGroup>
           </CardContent>
-        </Card>
-      </motion.div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 }
