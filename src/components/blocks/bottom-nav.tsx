@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, Heart, ShoppingCart, User, Plus } from "lucide-react";
+import {
+  Home,
+  Heart,
+  ShoppingCart,
+  User,
+  Plus,
+  Headphones,
+  Mail,
+  Settings,
+} from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -36,10 +45,11 @@ export default function BottomNavWithFab() {
     },
   ];
 
+  // FAB items with label, icon, and link
   const fabItems = [
-    { label: "Support", href: "/support" },
-    { label: "Contact", href: "/contact" },
-    { label: "Admin", href: "/admin" },
+    { label: "Support", icon: Headphones, href: "/support" },
+    { label: "Contact", icon: Mail, href: "/contact" },
+    { label: "Admin", icon: Settings, href: "/admin" },
   ];
 
   return (
@@ -153,7 +163,7 @@ export default function BottomNavWithFab() {
           <Plus size={28} />
         </motion.button>
 
-        {/* FAB Menu */}
+        {/* FAB Menu with label, icon, and link */}
         <AnimatePresence>
           {isFabOpen && (
             <motion.div
@@ -163,25 +173,31 @@ export default function BottomNavWithFab() {
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
               className="absolute left-1/2 -translate-x-1/2 -top-48 
                          bg-background/95 backdrop-blur-xl border border-border/50 
-                         rounded-2xl shadow-xl p-2 flex flex-col gap-1 min-w-[140px]"
+                         rounded-2xl shadow-xl p-2 flex flex-col gap-1 min-w-[160px]"
             >
-              {fabItems.map((item, i) => (
-                <motion.button
-                  key={item.href}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ delay: i * 0.05 }}
-                  onClick={() => {
-                    router.push(item.href);
-                    setIsFabOpen(false);
-                  }}
-                  className="px-4 py-2.5 text-sm text-foreground hover:bg-muted 
-                             rounded-xl transition-colors text-left"
-                >
-                  {item.label}
-                </motion.button>
-              ))}
+              {fabItems.map((item, i) => {
+                const Icon = item.icon;
+
+                return (
+                  <motion.button
+                    key={item.href}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ delay: i * 0.05 }}
+                    onClick={() => {
+                      router.push(item.href);
+                      setIsFabOpen(false);
+                    }}
+                    className="px-4 py-2.5 text-sm text-foreground hover:bg-muted 
+                               rounded-xl transition-colors text-left
+                               flex items-center gap-3"
+                  >
+                    <Icon size={18} className="text-muted-foreground" />
+                    <span>{item.label}</span>
+                  </motion.button>
+                );
+              })}
             </motion.div>
           )}
         </AnimatePresence>
