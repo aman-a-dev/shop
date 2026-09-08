@@ -20,12 +20,21 @@ import {
 } from "lucide-react";
 import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { getSession } from "@/lib/session";
+import { redirect } from "next/navigation";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // 1. Get the session payload (userId, role)
+  const session = await getSession();
+
+  // 2. If no session or role is not ADMIN, redirect to home
+  if (!session || session.role !== "ADMIN") {
+    redirect("/");
+  }
   return (
     <TooltipProvider>
       <SidebarProvider>
