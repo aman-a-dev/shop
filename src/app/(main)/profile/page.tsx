@@ -45,7 +45,11 @@ export default function ProfilePage() {
       </div>
     );
   }
-
+  console.log(
+    "Telegram WebApp exists:",
+    typeof window !== "undefined" && !!(window as any).Telegram?.WebApp,
+  );
+  console.log("initData raw:", (window as any).Telegram?.WebApp?.initData);
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-4 py-8">
       <ProfileView user={user} />
