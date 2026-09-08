@@ -37,7 +37,7 @@ model Product {
   name        String
   description String
   price       Decimal       @db.Decimal(10, 2)
-  stock       Int           @default(0)
+  stock       Int           @default(1)
   status      ProductStatus @default(ACTIVE)
 
   images      Image[]
