@@ -38,7 +38,7 @@ export function ProfileView({ user }: { user: ProfileUser }) {
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="flex flex-1 flex-col"
     >
-      <Card className="border-border/60">
+      <Card className="border-border/60 overflow-hidden">
         {/* Profile */}
         <CardContent className="flex flex-col items-center px-6 py-8">
           <motion.div
@@ -48,7 +48,7 @@ export function ProfileView({ user }: { user: ProfileUser }) {
             className="flex flex-col items-center gap-3 text-center"
           >
             <div className="rounded-full p-1 ring-1 ring-border/70 shadow-sm">
-              <Avatar size="lg" className="size-24">
+              <Avatar size="lg" className="size-28">
                 {user.avatar && (
                   <AvatarImage
                     src={user.avatar}
@@ -81,7 +81,7 @@ export function ProfileView({ user }: { user: ProfileUser }) {
         </CardContent>
 
         {/* Actions */}
-        <CardContent className="border-t border-border/50 p-4">
+        <CardContent className="border-t border-border/50 p-4 pt-4">
           <ItemGroup className="gap-2">
             <motion.div
               initial={{ opacity: 0, y: 8 }}
