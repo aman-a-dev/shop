@@ -1,5 +1,3 @@
-// app/(main)/cart/page.tsx
-
 import { Suspense } from "react";
 import { ShoppingCart, AlertCircle } from "lucide-react";
 import { getCart } from "@/actions/cart"; // now exported
@@ -18,7 +16,7 @@ import { formattedPrice } from "@/lib/utils";
 
 async function CartContent() {
   const result = await getCart();
-
+  const phoneNo = "251902991919";
   if (!result.success) {
     return (
       <Empty>
@@ -80,12 +78,13 @@ async function CartContent() {
           <p className="text-2xl font-bold">{formattedPrice(total)}</p>
         </div>
         <Button
-          render={<a href="tele:0902991919" />}
+          render={<a href={`tel:${phoneNo}`} />}
           size="lg"
           className="w-full sm:w-auto"
         >
           Buy Now
         </Button>
+        <p className="text-xs text-center">To buy call to {phoneNo} now.</p>
       </div>
     </div>
   );

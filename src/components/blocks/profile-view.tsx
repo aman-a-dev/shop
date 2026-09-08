@@ -47,7 +47,7 @@ export function ProfileView({ user }: { user: ProfileUser }) {
             className="flex flex-col items-center gap-4 text-center"
           >
             <div className="rounded-full p-1.5 ring-2 ring-border/70 shadow-md">
-              <Avatar size="lg" className="size-44">
+              <Avatar size="lg" className="size-56">
                 {user.avatar && (
                   <AvatarImage
                     src={user.avatar}
@@ -55,7 +55,7 @@ export function ProfileView({ user }: { user: ProfileUser }) {
                     className="object-cover"
                   />
                 )}
-                <AvatarFallback className="text-2xl font-medium">
+                <AvatarFallback className="text-3xl font-medium">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -76,7 +76,7 @@ export function ProfileView({ user }: { user: ProfileUser }) {
           </motion.div>
         </CardContent>
         {/* Actions */}
-        <CardContent className="border-t border-border/50 p-4 pb-2">
+        <CardContent className="border-t border-border/50 p-4 pb-0">
           <ItemGroup className="gap-2">
             <motion.div
               initial={{ opacity: 0, y: 8 }}
