@@ -39,16 +39,16 @@ export function ProfileView({ user }: { user: ProfileUser }) {
       className="flex flex-1 flex-col"
     >
       <Card className="border-border/60">
-        <CardContent className="p-0">
-          {/* Profile header */}
+        {/* Profile */}
+        <CardContent className="flex flex-col items-center px-6 py-8">
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.05 }}
-            className="flex flex-col items-center gap-3 px-6 py-8"
+            className="flex flex-col items-center gap-3 text-center"
           >
             <div className="rounded-full p-1 ring-1 ring-border/70 shadow-sm">
-              <Avatar size="lg" className="size-20">
+              <Avatar size="lg" className="size-24">
                 {user.avatar && (
                   <AvatarImage
                     src={user.avatar}
@@ -56,13 +56,13 @@ export function ProfileView({ user }: { user: ProfileUser }) {
                     className="object-cover"
                   />
                 )}
-                <AvatarFallback className="text-lg font-medium">
+                <AvatarFallback className="text-xl font-medium">
                   {initials}
                 </AvatarFallback>
               </Avatar>
             </div>
 
-            <div className="flex flex-col items-center gap-0.5 text-center">
+            <div className="flex flex-col items-center gap-0.5">
               <span className="text-base font-semibold tracking-tight">
                 {user.name}
               </span>
@@ -78,28 +78,57 @@ export function ProfileView({ user }: { user: ProfileUser }) {
               </span>
             </div>
           </motion.div>
+        </CardContent>
 
-          {/* Support + Admin */}
-          <CardContent className="border-t border-border/50 p-4">
-            <ItemGroup className="gap-2">
+        {/* Actions */}
+        <CardContent className="border-t border-border/50 p-4">
+          <ItemGroup className="gap-2">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.12 }}
+            >
+              <Item
+                variant="outline"
+                render={<a href="https://t.me/Aman_a_dev" />}
+                className="cursor-pointer transition-all duration-200 hover:bg-muted/50 hover:shadow-sm active:scale-[0.99]"
+              >
+                <ItemMedia variant="icon">
+                  <LifeBuoy />
+                </ItemMedia>
+
+                <ItemContent>
+                  <ItemTitle className="font-medium">Support</ItemTitle>
+                  <ItemDescription className="text-xs">
+                    Get help or contact us
+                  </ItemDescription>
+                </ItemContent>
+
+                <ItemActions>
+                  <ChevronRight className="size-4 text-muted-foreground" />
+                </ItemActions>
+              </Item>
+            </motion.div>
+
+            {user.role === "ADMIN" && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.12 }}
+                transition={{ duration: 0.3, delay: 0.18 }}
               >
                 <Item
                   variant="outline"
-                  render={<a href="https://t.me/Aman_a_dev" />}
+                  render={<Link href="/admin" />}
                   className="cursor-pointer transition-all duration-200 hover:bg-muted/50 hover:shadow-sm active:scale-[0.99]"
                 >
                   <ItemMedia variant="icon">
-                    <LifeBuoy />
+                    <ShieldUser />
                   </ItemMedia>
 
                   <ItemContent>
-                    <ItemTitle className="font-medium">Support</ItemTitle>
+                    <ItemTitle className="font-medium">Admin panel</ItemTitle>
                     <ItemDescription className="text-xs">
-                      Get help or contact us
+                      Manage products and orders
                     </ItemDescription>
                   </ItemContent>
 
@@ -108,37 +137,8 @@ export function ProfileView({ user }: { user: ProfileUser }) {
                   </ItemActions>
                 </Item>
               </motion.div>
-
-              {user.role === "ADMIN" && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.18 }}
-                >
-                  <Item
-                    variant="outline"
-                    render={<Link href="/admin" />}
-                    className="cursor-pointer transition-all duration-200 hover:bg-muted/50 hover:shadow-sm active:scale-[0.99]"
-                  >
-                    <ItemMedia variant="icon">
-                      <ShieldUser />
-                    </ItemMedia>
-
-                    <ItemContent>
-                      <ItemTitle className="font-medium">Admin panel</ItemTitle>
-                      <ItemDescription className="text-xs">
-                        Manage products and orders
-                      </ItemDescription>
-                    </ItemContent>
-
-                    <ItemActions>
-                      <ChevronRight className="size-4 text-muted-foreground" />
-                    </ItemActions>
-                  </Item>
-                </motion.div>
-              )}
-            </ItemGroup>
-          </CardContent>
+            )}
+          </ItemGroup>
         </CardContent>
       </Card>
     </motion.div>
