@@ -1,12 +1,8 @@
+// context/telegram-context.tsx
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import {
-  init,
-  backButton,
-  viewport,
-  retrieveLaunchParams,
-} from "@telegram-apps/sdk-react";
+import { init, backButton, viewport } from "@telegram-apps/sdk-react";
 
 interface TelegramContextValue {
   ready: boolean;
@@ -20,21 +16,24 @@ export function TelegramProvider({ children }: { children: React.ReactNode }) {
   const [initDataRaw, setInitDataRaw] = useState<string | undefined>();
 
   useEffect(() => {
+    // Read initData straight from the proven-working global.
+    const webApp = (window as any).Telegram?.WebApp;
+    if (webApp?.initData) {
+      setInitDataRaw(webApp.initData);
+    }
+
+    // SDK setup for back button / viewport — isolated so a failure
+    // here can never block initData or the rest of the app.
     try {
       init();
       backButton.mount();
       viewport.mount();
       viewport.expand();
-
-      const launchParams = retrieveLaunchParams();
-      if (typeof launchParams.initDataRaw === "string") {
-        setInitDataRaw(launchParams.initDataRaw);
-      }
     } catch (err) {
-      console.error("Telegram SDK init failed:", err);
-    } finally {
-      setReady(true);
+      console.error("Telegram SDK feature init failed (non-blocking):", err);
     }
+
+    setReady(true);
   }, []);
 
   return (
