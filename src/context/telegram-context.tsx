@@ -1,7 +1,13 @@
+// context/telegram-context.tsx
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { init, backButton, viewport } from "@telegram-apps/sdk-react";
+import {
+  init,
+  backButton,
+  viewport,
+  retrieveLaunchParams,
+} from "@telegram-apps/sdk-react";
 
 interface TelegramContextValue {
   ready: boolean;
@@ -15,21 +21,21 @@ export function TelegramProvider({ children }: { children: React.ReactNode }) {
   const [initDataRaw, setInitDataRaw] = useState<string | undefined>();
 
   useEffect(() => {
-    // Initialize the SDK
-    init();
+    try {
+      init();
+      backButton.mount();
+      viewport.mount();
+      viewport.expand();
 
-    // Mount required components
-    backButton.mount();
-    viewport.mount();
-    viewport.expand();
-
-    // Get launch params – use the global WebApp object
-    const webApp = (window as any).Telegram?.WebApp;
-    if (webApp?.initData) {
-      setInitDataRaw(webApp.initData);
+      const launchParams = retrieveLaunchParams();
+      if (typeof launchParams.initDataRaw === "string") {
+        setInitDataRaw(launchParams.initDataRaw);
+      }
+    } catch (err) {
+      console.error("Telegram SDK init failed:", err);
+    } finally {
+      setReady(true);
     }
-
-    setReady(true);
   }, []);
 
   return (
