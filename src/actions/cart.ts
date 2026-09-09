@@ -1,5 +1,3 @@
-// actions/cart.ts (full updated file)
-
 "use server";
 
 import prisma from "@/lib/prisma";
@@ -7,25 +5,33 @@ import { revalidatePath } from "next/cache";
 import type { ActionResult } from "./products";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
-// ---------- PUBLIC CART ACTIONS (for logged-in users) ----------
+
+// ---------- HELPERS ----------
 
 async function getCurrentUserId() {
-  // Replace with your actual auth logic
   const session = await getSession();
+  if (!session) {
+    // No session → redirect to home (or you could throw an error)
+    redirect("/");
+  }
+  return session.userId;
+}
 
-  // 2. If no session or role is not ADMIN, redirect to home
+async function requireAdmin() {
+  const session = await getSession();
   if (!session || session.role !== "ADMIN") {
     redirect("/");
   }
   return session.userId;
 }
 
+// ---------- PUBLIC CART ACTIONS ----------
+
 export async function addToCart(productId: number, quantity: number = 1) {
   try {
     const userId = await getCurrentUserId();
 
     let cart = await prisma.cart.findUnique({ where: { userId } });
-
     if (!cart) {
       cart = await prisma.cart.create({ data: { userId } });
     }
@@ -124,6 +130,7 @@ export type CartWithDetails = {
 
 export async function getAllCarts(): Promise<ActionResult<CartWithDetails[]>> {
   try {
+    await requireAdmin(); // enforce admin role
     const carts = await prisma.cart.findMany({
       include: {
         user: {
@@ -168,6 +175,7 @@ export async function searchCarts(
   query: string,
 ): Promise<ActionResult<CartWithDetails[]>> {
   try {
+    await requireAdmin();
     const isNumeric = !isNaN(Number(query));
     const carts = await prisma.cart.findMany({
       where: {
@@ -217,6 +225,7 @@ export async function searchCarts(
 
 export async function getCartTotal(cartId: number): Promise<number> {
   try {
+    await requireAdmin();
     const cart = await prisma.cart.findUnique({
       where: { id: cartId },
       include: {
