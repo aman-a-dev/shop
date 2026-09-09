@@ -123,8 +123,8 @@ export function SearchBar() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 mx-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground bg-background" />
+        <div className="relative flex-1  bg-background">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Search products by name or description..."
