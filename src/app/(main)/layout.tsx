@@ -9,7 +9,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen w-full bg-[#f8fafc] relative">
+    <div className="min-h-screen w-full bg-background relative">
       {/* Grid background – absolute behind everything */}
       <div
         className="absolute inset-0 z-0 pointer-events-none"
