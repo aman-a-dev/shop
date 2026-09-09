@@ -47,8 +47,8 @@ export default function BottomNavWithFab() {
 
   // FAB items with label, icon, and link
   const fabItems = [
-    { label: "Support", icon: Headphones, href: "/support" },
-    { label: "Contact", icon: Mail, href: "/contact" },
+    { label: "Support", icon: Headphones, href: "https://t.me/Aman_a_dev" },
+    { label: "Contact", icon: Mail, href: "https://t.me/Aman_a_dev" },
     { label: "Admin", icon: Settings, href: "/admin" },
   ];
 

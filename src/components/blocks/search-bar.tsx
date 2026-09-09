@@ -91,7 +91,7 @@ export function SearchBar() {
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton
               key={i}
-              className="mb-2 break-inside-avoid rounded-lg aspect-[3/4]"
+              className="mb-2 break-inside-avoid rounded-lg aspect-3/4"
             />
           ))}
         </div>
@@ -122,7 +122,7 @@ export function SearchBar() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mx-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
