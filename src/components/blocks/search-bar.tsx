@@ -83,11 +83,11 @@ export function SearchBar() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mx-4">
           <Skeleton className="h-10 flex-1" />
           <Skeleton className="h-10 w-10" />
         </div>
-        <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2">
+        <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 mx-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton
               key={i}
