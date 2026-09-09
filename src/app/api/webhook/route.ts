@@ -1,4 +1,6 @@
+// app/api/webhook/route.ts
 import { Bot, webhookCallback } from "grammy";
+import { NextRequest } from "next/server";
 
 const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN!);
 
@@ -26,10 +28,17 @@ bot.on("message", async (ctx) => {
   await ctx.reply("Send /start to see the menu.");
 });
 
-// Type assertion to bypass the type error – works at runtime
-export const POST = webhookCallback(bot, "next" as any);
+// ✅ Properly await the webhook callback
+export const POST = async (req: NextRequest) => {
+  try {
+    const handler = webhookCallback(bot, "std/http");
+    return await handler(req);
+  } catch (error) {
+    console.error("Webhook error:", error);
+    return new Response("Internal Server Error", { status: 500 });
+  }
+};
 
-// Optional: a GET handler for testing/webhook verification
 export async function GET() {
   return new Response("Webhook is ready", { status: 200 });
 }
