@@ -1,4 +1,3 @@
-// app/(admin)/admin/cart/page.tsx
 "use client";
 
 import { Suspense } from "react";
@@ -201,7 +200,7 @@ function CartsContent() {
                         </TableCell>
                         <TableCell>{item.quantity}</TableCell>
                         <TableCell className="text-right">
-                          $
+                          ETB
                           {(Number(item.product.price) * item.quantity).toFixed(
                             2,
                           )}
