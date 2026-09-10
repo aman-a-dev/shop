@@ -57,6 +57,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
           {coverImage ? (
             <img
               src={coverImage}
+              onError={() => alert("error")}
               alt={name}
               loading="lazy"
               className={cn(
