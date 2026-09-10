@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/carousel";
 import { formattedPrice } from "@/lib/utils";
 
+// ─── Page ────────────────────────────────────────────────────────
 export default async function ProductPage({
   params,
 }: {
@@ -21,21 +22,27 @@ export default async function ProductPage({
   const { slug } = await params;
   const id = parseInt(slug, 10);
 
-  if (isNaN(id)) notFound();
+  if (isNaN(id)) {
+    notFound();
+  }
 
   const product = await prisma.product.findUnique({
     where: { id },
     include: { images: true },
   });
 
-  if (!product) notFound();
+  if (!product) {
+    notFound();
+  }
 
+  // Order images: cover first, then the rest
   const sortedImages = [...product.images].sort((a, b) => {
     if (a.isCover) return -1;
     if (b.isCover) return 1;
     return 0;
   });
 
+  // If no images, use a placeholder
   const images =
     sortedImages.length > 0
       ? sortedImages.map((img) => img.url)
@@ -53,18 +60,22 @@ export default async function ProductPage({
               opts={{ align: "start", loop: images.length > 1 }}
               className="w-full"
             >
-              {/* Fixed aspect ratio keeps every slide the same height */}
-              <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-muted shadow-lg">
-                <CarouselContent className="h-full">
+              {/* Shadow + rounded live OUTSIDE the carousel so the
+                  viewport's overflow-hidden cannot clip them */}
+              <div className="rounded-xl bg-muted shadow-lg overflow-hidden">
+                <CarouselContent>
                   {images.map((url, index) => (
-                    <CarouselItem key={index} className="h-full basis-full">
-                      <div className="relative h-full w-full">
+                    <CarouselItem key={index} className="pl-0 basis-full">
+                      {/* THIS sized box gives every slide the same height.
+                          The absolute <img> below fills it. */}
+                      <div className="relative w-full aspect-square">
                         <img
                           src={url}
                           alt={`${product.name} - image ${index + 1}`}
                           className="absolute inset-0 h-full w-full object-cover"
-                          // use object-contain if you'd rather letterbox than crop:
-                          // className="absolute inset-0 h-full w-full object-contain bg-muted"
+                          // Use object-contain instead of object-cover
+                          // if you'd rather letterbox than crop:
+                          // className="absolute inset-0 h-full w-full object-contain"
                         />
                       </div>
                     </CarouselItem>
@@ -79,8 +90,7 @@ export default async function ProductPage({
                     variant="outline"
                     className="static translate-y-0 h-9 w-9 rounded-full"
                   />
-                  {/* Optional: page indicator */}
-                  <span className="text-xs text-muted-foreground tabular-nums">
+                  <span className="text-xs text-muted-foreground">
                     Swipe to browse
                   </span>
                   <CarouselNext
@@ -91,7 +101,7 @@ export default async function ProductPage({
               )}
             </Carousel>
 
-            {/* Optional thumbnail strip */}
+            {/* Thumbnail strip */}
             {images.length > 1 && (
               <div className="mt-4 grid grid-cols-5 gap-2">
                 {images.slice(0, 5).map((url, i) => (
