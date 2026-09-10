@@ -7,7 +7,6 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
@@ -47,7 +46,6 @@ export default async function AdminLayout({
           </header>
           <main className="flex-1 p-6">{children}</main>
         </SidebarInset>
-        <Toaster />
       </SidebarProvider>
     </TooltipProvider>
   );
