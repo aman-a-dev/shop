@@ -26,7 +26,7 @@ export default function BottomNavWithFab() {
       label: "Favourites",
       icon: Heart,
       href: "/favourites",
-      color: "text-rose-500",
+      color: "text-primary"
     },
   ];
 
@@ -35,21 +35,20 @@ export default function BottomNavWithFab() {
       label: "Cart",
       icon: ShoppingCart,
       href: "/cart",
-      color: "text-emerald-500",
+      color: "text-primary"
     },
     {
       label: "Profile",
       icon: User,
       href: "/profile",
-      color: "text-violet-500",
+      color: "text-primary"
     },
   ];
 
-  // FAB items with label, icon, and link
   const fabItems = [
     { label: "Support", icon: Headphones, href: "https://t.me/Aman_a_dev" },
     { label: "Contact", icon: Mail, href: "https://t.me/Aman_a_dev" },
-    { label: "Admin", icon: Settings, href: "/admin" },
+    /*{ label: "Admin", icon: Settings, href: "/admin" },*/
   ];
 
   return (
