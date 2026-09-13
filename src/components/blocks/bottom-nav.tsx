@@ -48,7 +48,7 @@ export default function BottomNavWithFab() {
   const fabItems = [
     { label: "Support", icon: Headphones, href: "https://t.me/Aman_a_dev" },
     { label: "Contact", icon: Mail, href: "https://t.me/Aman_a_dev" },
-    /*{ label: "Admin", icon: Settings, href: "/admin" },*/
+    { label: "Admin", icon: Settings, href: "/admin" },
   ];
 
   return (
